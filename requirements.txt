@@ -1,0 +1,10 @@
+﻿pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.5
+fastapi>=0.115
+uvicorn>=0.30
+joblib>=1.4
+xlrd>=2.0.1
+jupyter>=1.1
+xgboost>=2.1
+lightgbm>=4.5
