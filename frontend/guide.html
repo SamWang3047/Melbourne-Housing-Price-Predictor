@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Guide</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --panel: #fffdf8;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --accent: #b85042;
+      --border: #dccfc0;
+      --shadow: 0 20px 50px rgba(50, 42, 32, 0.12);
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--ink);
+      padding: 28px 18px 40px;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    p, li {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    ol {
+      padding-left: 22px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <p class="eyebrow">Frontend Guide</p>
+      <h1>How to use the forecast page</h1>
+      <p>The main page lets you search for a Melbourne locality and instantly view a quarterly price trend with the next-quarter forecast.</p>
+
+      <ol>
+        <li>Open the main page at <a href="/">/</a>.</li>
+        <li>Type a locality name such as <strong>Camberwell</strong>.</li>
+        <li>Choose one of the autocomplete suggestions.</li>
+        <li>Click <strong>Generate Forecast</strong> or press Enter.</li>
+        <li>Read the summary cards above the chart.</li>
+        <li>Use the chart to compare the historical blue series with the red forecast segment.</li>
+      </ol>
+
+      <p>The chart shows:</p>
+      <ol>
+        <li>Blue line: historical quarterly prices</li>
+        <li>Red dashed line: forecast segment</li>
+        <li>Price label on every node</li>
+      </ol>
+
+      <p><a href="/">Back to forecast page</a></p>
+    </div>
+  </div>
+</body>
+</html>

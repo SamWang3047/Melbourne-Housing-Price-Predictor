@@ -150,6 +150,12 @@ Open the simple frontend:
 http://127.0.0.1:8000/
 ```
 
+Open the frontend guide page:
+
+```text
+http://127.0.0.1:8000/guide
+```
+
 Available endpoints:
 
 - `GET /health`
@@ -166,6 +172,30 @@ The homepage provides a lightweight search experience:
 - choose from autocomplete suggestions
 - view the quarterly trend chart immediately
 - see the forecast segment highlighted in a different color from the historical series
+- read the forecast summary cards above the chart
+
+## Frontend Operation Guide
+
+The frontend is designed for direct use in the browser:
+
+1. start the API with `uvicorn app:app --host 0.0.0.0 --port 8000 --reload`
+2. open `http://127.0.0.1:8000/`
+3. type a locality name such as `Camberwell`
+4. click one of the autocomplete suggestions or press Enter
+5. review the summary cards for locality, forecast quarter, latest actual price, and predicted price
+6. inspect the trend chart below
+
+The chart reading logic is:
+
+- blue line: historical quarterly prices
+- red dashed segment: predicted continuation
+- every node: price label
+
+If you want a browser-side help page, open:
+
+```text
+http://127.0.0.1:8000/guide
+```
 
 The chart uses:
 

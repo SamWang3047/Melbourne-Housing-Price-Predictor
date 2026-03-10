@@ -21,6 +21,7 @@ MODEL_PATH = ARTIFACTS_DIR / "best_model.joblib"
 HISTORY_PATH = ARTIFACTS_DIR / "latest_history.csv"
 CLEAN_DATA_PATH = ARTIFACTS_DIR / "clean_long_data.csv"
 FRONTEND_PATH = ROOT / "frontend" / "index.html"
+GUIDE_PATH = ROOT / "frontend" / "guide.html"
 
 app = FastAPI(
     title="Melbourne Housing Price Predictor",
@@ -160,6 +161,14 @@ def index() -> HTMLResponse:
     if not FRONTEND_PATH.exists():
         raise HTTPException(status_code=500, detail="Frontend file is missing.")
     return HTMLResponse(FRONTEND_PATH.read_text(encoding="utf-8"))
+
+
+@app.get("/guide", response_class=HTMLResponse)
+def guide() -> HTMLResponse:
+    # Serve a simple usage guide for the frontend page.
+    if not GUIDE_PATH.exists():
+        raise HTTPException(status_code=500, detail="Guide file is missing.")
+    return HTMLResponse(GUIDE_PATH.read_text(encoding="utf-8"))
 
 
 @app.get("/health")
