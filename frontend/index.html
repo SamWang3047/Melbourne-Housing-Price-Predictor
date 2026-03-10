@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melbourne Housing Forecaster</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --panel: #fffdf8;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --accent: #b85042;
+      --accent-2: #2f6690;
+      --border: #dccfc0;
+      --shadow: 0 20px 50px rgba(50, 42, 32, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top right, rgba(184, 80, 66, 0.12), transparent 28%),
+        radial-gradient(circle at left center, rgba(47, 102, 144, 0.12), transparent 24%),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 18px 40px;
+    }
+
+    .hero {
+      margin-bottom: 22px;
+    }
+
+    .hero-card,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .hero-card p,
+    .panel p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .summary-panel {
+      margin-bottom: 22px;
+    }
+
+    .search-wrap {
+      position: relative;
+      margin-top: 18px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+      flex: 1 1 320px;
+      padding: 15px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 15px 22px;
+      background: linear-gradient(135deg, var(--accent), #d06f5c);
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover { filter: brightness(1.04); }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+      display: none;
+      z-index: 10;
+    }
+
+    .suggestion {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1e8de;
+    }
+
+    .suggestion:last-child { border-bottom: none; }
+    .suggestion:hover { background: #faf4ee; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 18px;
+      background: #faf5ef;
+      border: 1px solid #eadfd3;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .chart-box {
+      min-height: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(47, 102, 144, 0.05), rgba(184, 80, 66, 0.03));
+      padding: 20px;
+    }
+
+    .chart-box img {
+      width: 100%;
+      max-height: 860px;
+      object-fit: contain;
+      border-radius: 18px;
+      display: none;
+    }
+
+    .placeholder {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    .status {
+      margin-top: 14px;
+      min-height: 24px;
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <p class="eyebrow">Melbourne Housing Predictor</p>
+        <h1>Type a locality. Get the next-quarter forecast.</h1>
+        <p>Example: <strong>Camberwell</strong></p>
+        <div class="search-wrap">
+          <div class="search-row">
+            <input id="locality-input" type="text" placeholder="Enter a locality, for example Camberwell" autocomplete="off">
+            <button id="search-button" type="button">Generate Forecast</button>
+          </div>
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+    </section>
+
+    <section class="panel summary-panel">
+      <p class="eyebrow">Forecast Summary</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Locality</div>
+          <div id="locality-name" class="stat-value">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Forecast Period</div>
+          <div id="forecast-period" class="stat-value">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Latest Actual Price</div>
+          <div id="latest-price" class="stat-value">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Predicted Price</div>
+          <div id="predicted-price" class="stat-value">-</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel chart-box">
+      <div id="placeholder" class="placeholder">
+        <h3>Chart preview</h3>
+        <p>Select a locality to view the trend and forecast.</p>
+      </div>
+      <img id="forecast-chart" alt="Quarterly house price forecast chart">
+    </section>
+  </div>
+
+  <script>
+    const input = document.getElementById("locality-input");
+    const button = document.getElementById("search-button");
+    const suggestionsBox = document.getElementById("suggestions");
+    const statusBox = document.getElementById("status");
+    const chart = document.getElementById("forecast-chart");
+    const placeholder = document.getElementById("placeholder");
+
+    const fields = {
+      locality: document.getElementById("locality-name"),
+      period: document.getElementById("forecast-period"),
+      latest: document.getElementById("latest-price"),
+      predicted: document.getElementById("predicted-price"),
+    };
+
+    let currentSuggestions = [];
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-AU", {
+        style: "currency",
+        currency: "AUD",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function setStatus(message) {
+      statusBox.textContent = message || "";
+    }
+
+    function renderSuggestions(items) {
+      currentSuggestions = items;
+      suggestionsBox.innerHTML = "";
+      if (!items.length) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
+
+      items.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.textContent = item;
+        div.addEventListener("click", () => {
+          input.value = item;
+          suggestionsBox.style.display = "none";
+          fetchForecast();
+        });
+        suggestionsBox.appendChild(div);
+      });
+
+      suggestionsBox.style.display = "block";
+    }
+
+    async function fetchSuggestions() {
+      const value = input.value.trim();
+      if (!value) {
+        renderSuggestions([]);
+        return;
+      }
+
+      const response = await fetch(`/localities?query=${encodeURIComponent(value)}`);
+      const data = await response.json();
+      renderSuggestions(data.items || []);
+    }
+
+    async function fetchForecast() {
+      const locality = input.value.trim();
+      if (!locality) {
+        setStatus("Please enter a locality first.");
+        return;
+      }
+
+      setStatus("Generating forecast...");
+      suggestionsBox.style.display = "none";
+
+      try {
+        const response = await fetch(`/forecast?locality=${encodeURIComponent(locality)}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Unable to generate forecast.");
+        }
+
+        fields.locality.textContent = data.locality;
+        fields.period.textContent = `${data.prediction_year} Q${data.prediction_quarter}`;
+        fields.latest.textContent = formatCurrency(data.latest_actual_price);
+        fields.predicted.textContent = formatCurrency(data.predicted_median_price);
+
+        chart.src = `${data.chart_url}&ts=${Date.now()}`;
+        chart.style.display = "block";
+        placeholder.style.display = "none";
+        setStatus("Forecast ready.");
+      } catch (error) {
+        chart.style.display = "none";
+        placeholder.style.display = "block";
+        setStatus(error.message);
+      }
+    }
+
+    input.addEventListener("input", () => {
+      fetchSuggestions().catch(() => setStatus("Suggestion lookup failed."));
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        fetchForecast();
+      }
+    });
+
+    button.addEventListener("click", fetchForecast);
+
+    document.addEventListener("click", (event) => {
+      if (!suggestionsBox.contains(event.target) && event.target !== input) {
+        suggestionsBox.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

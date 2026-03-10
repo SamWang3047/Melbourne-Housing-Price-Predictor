@@ -21,6 +21,7 @@ This repository includes:
 - exported plots for GitHub-friendly presentation
 - trained artifacts for direct inference
 - a FastAPI app for local or cloud deployment
+- a simple browser UI with locality autocomplete and forecast chart rendering
 
 ## Visual Highlights
 
@@ -143,10 +144,33 @@ Open the automatic API docs:
 http://127.0.0.1:8000/docs
 ```
 
+Open the simple frontend:
+
+```text
+http://127.0.0.1:8000/
+```
+
 Available endpoints:
 
 - `GET /health`
+- `GET /localities`
+- `GET /forecast`
+- `GET /forecast-chart`
 - `POST /predict`
+
+## Frontend Experience
+
+The homepage provides a lightweight search experience:
+
+- type a locality such as `Camberwell`
+- choose from autocomplete suggestions
+- view the quarterly trend chart immediately
+- see the forecast segment highlighted in a different color from the historical series
+
+The chart uses:
+
+- blue for historical observations
+- red dashed styling for the forecast segment
 
 Example request:
 
