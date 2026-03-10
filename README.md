@@ -1,88 +1,199 @@
-﻿# Melbourne Housing Price Predictor
+# Melbourne Housing Price Predictor
 
-基于 Victorian Property Sales Report (VPSR) 的墨尔本房价预测项目，包含：
-- 数据清洗（多份 `.xls` 合并）
-- 特征工程（时序滞后与滚动特征）
-- 模型对比（线性回归 / 随机森林 / GBDT / XGBoost / LightGBM）
-- FastAPI 预测接口
+Forecasting quarterly median house prices across Melbourne localities using the Victorian Property Sales Report (VPSR), with a full notebook workflow, visual storytelling, model benchmarking, and a deployable FastAPI service.
 
-## 1. 项目结构
+## Project Snapshot
+
+- Data source: Victorian Property Sales Report (`.xls`)
+- Forecast target: quarterly median house price
+- Coverage: `777` Melbourne localities
+- Best model: `LinearRegression`
+- Latest benchmark: `MAE = 93,477.93`, `RMSE = 155,557.10`, `R2 = 0.9236`
+- Deployment: `FastAPI + Uvicorn`
+
+## Why This Project
+
+The goal of this project is to turn irregular government-style housing spreadsheets into a reproducible machine learning workflow that is easy to explain, easy to extend, and practical to deploy.
+
+This repository includes:
+
+- a self-contained Jupyter Notebook for cleaning, analysis, feature engineering, training, and conclusions
+- exported plots for GitHub-friendly presentation
+- trained artifacts for direct inference
+- a FastAPI app for local or cloud deployment
+
+## Visual Highlights
+
+### Market Trend
+
+![Market Trend](assets/market_trend.png)
+
+### Most Expensive Localities in the Latest Quarter
+
+![Latest Top Localities](assets/latest_top_localities.png)
+
+### Model Benchmark Comparison
+
+![Model Comparison](assets/model_comparison.png)
+
+### Actual vs Predicted Prices
+
+![Actual vs Predicted](assets/actual_vs_predicted.png)
+
+## Key Findings
+
+- Melbourne house prices vary substantially across localities, with clear high-end and mid-market segmentation.
+- Lag-based historical price features are strong predictors for short-term quarterly forecasting.
+- In this dataset, a simple linear model outperformed more complex tree-based methods.
+- The current workflow is strong enough for a portfolio project, a teaching example, or a lightweight prototype API.
+
+## Repository Structure
 
 ```text
 .
-├─ dataset/                  # 你的 VPSR 原始数据（.xls）
-├─ artifacts/                # 训练输出（自动生成）
-│  ├─ clean_long_data.csv
-│  ├─ best_model.joblib
-│  ├─ latest_history.csv
-│  └─ metrics.json
-├─ src/
-│  ├─ data_pipeline.py       # 数据清洗与标准化
-│  ├─ train.py               # 特征工程 + 模型训练/对比
-│  └─ api_fastapi.py         # FastAPI 服务
-├─ notebooks/
-│  └─ melbourne_housing_model.ipynb   # Jupyter Notebook 工作流
-└─ requirements.txt
+|-- app.py
+|-- assets/
+|   |-- actual_vs_predicted.png
+|   |-- latest_top_localities.png
+|   |-- locality_trends.png
+|   |-- market_trend.png
+|   |-- model_comparison.png
+|   |-- observation_coverage.png
+|   `-- price_distribution.png
+|-- artifacts/
+|   |-- best_model.joblib
+|   |-- clean_long_data.csv
+|   |-- latest_history.csv
+|   `-- metrics.json
+|-- dataset/
+|-- notebooks/
+|   `-- melbourne_housing_model.ipynb
+|-- .gitignore
+|-- README.md
+`-- requirements.txt
 ```
 
-## 0. 使用 Jupyter Notebook（推荐）
+## Main Notebook
 
-```bash
-jupyter notebook
-```
+The full workflow lives in [notebooks/melbourne_housing_model.ipynb](/E:/!Projects/Python/Melbourne Housing Price Predictor/notebooks/melbourne_housing_model.ipynb).
 
-然后打开：
-- `notebooks/melbourne_housing_model.ipynb`
+The notebook has already been executed and saved with outputs, so GitHub can render:
 
-## 2. 安装依赖
+- tables
+- charts
+- benchmark results
+- final conclusions
+
+The notebook covers:
+
+1. raw VPSR data cleaning
+2. exploratory data analysis
+3. feature engineering
+4. model benchmarking
+5. artifact export
+6. prediction helper design
+7. deployment-oriented API logic
+8. final interpretation and limitations
+
+## Model Benchmark
+
+| Model | MAE | RMSE | R2 |
+|---|---:|---:|---:|
+| LinearRegression | 93,477.93 | 155,557.10 | 0.9236 |
+| GradientBoosting | 106,093.60 | 182,402.66 | 0.8950 |
+| RandomForest | 114,125.85 | 193,661.20 | 0.8816 |
+| XGBoost | 113,086.41 | 195,737.24 | 0.8790 |
+| LightGBM | 124,020.14 | 229,072.94 | 0.8343 |
+
+## Installation
+
+Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 3. 训练模型
+## Run the Notebook
+
+Start Jupyter:
 
 ```bash
-python src/train.py
+jupyter notebook
 ```
 
-训练后会在 `artifacts/metrics.json` 里看到模型对比指标（MAE/RMSE/R2）和最佳模型。
+Then open:
 
-## 4. 启动 API
+```text
+notebooks/melbourne_housing_model.ipynb
+```
+
+## FastAPI Deployment
+
+This repository includes a deployable FastAPI app in [app.py](/E:/!Projects/Python/Melbourne Housing Price Predictor/app.py).
+
+Start the API locally:
 
 ```bash
-uvicorn src.api_fastapi:app --reload --host 0.0.0.0 --port 8000
+uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
-接口：
-- `GET /health`：健康检查
-- `POST /predict`：预测某个区域某季度的中位房价
+Open the automatic API docs:
 
-## 5. 预测请求示例
+```text
+http://127.0.0.1:8000/docs
+```
+
+Available endpoints:
+
+- `GET /health`
+- `POST /predict`
+
+Example request:
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/predict" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "locality": "ABBOTSFORD",
-    "year": 2026,
-    "quarter": 2
-  }'
+curl -X POST "http://127.0.0.1:8000/predict" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"locality\":\"ABBOTSFORD\",\"year\":2026,\"quarter\":2}"
 ```
 
-说明：
-- `lag_1` / `lag_2` / `rolling_mean_2` 可不传，接口会尝试从 `artifacts/latest_history.csv` 自动补齐。
-- 如果某个区域历史数据不足，会返回 400，并提示手动提供 lag 特征。
+Example response:
 
-## 6. 当前实现的关键点
+```json
+{
+  "locality": "ABBOTSFORD",
+  "year": 2026,
+  "quarter": 2,
+  "predicted_median_price": 1260616.82,
+  "used_history_defaults": true
+}
+```
 
-- 清洗层会自动识别季度列（如 `Jan-Mar 2024`、`Apr-Jun` + 年份行），并过滤销售量/变化率列。
-- 多来源重复季度数据按 `locality-year-quarter` 求均值去重。
-- 训练采用按时间切分（避免随机切分造成数据泄漏）。
+## Generated Artifacts
 
-## 7. 下一步可选优化
+Running the notebook produces:
 
-- 引入地理特征（Postcode、距CBD、学区）
-- 引入宏观变量（利率、人口增长、库存）
-- 使用更强的时序模型（LightGBM / XGBoost / Temporal CV）
-- 增加可视化看板（Streamlit）
+- `artifacts/clean_long_data.csv`
+- `artifacts/best_model.joblib`
+- `artifacts/latest_history.csv`
+- `artifacts/metrics.json`
+
+These files are used both for analysis and for API inference.
+
+## Visual Design Notes
+
+- All bar charts in the notebook include explicit numeric labels.
+- Key figures are exported to `assets/` so the README can display them directly.
+- The notebook is written with English code comments to improve readability for GitHub visitors.
+
+## Limitations
+
+- The current feature set is focused on locality identity and historical price lags.
+- The model does not yet include macroeconomic indicators, geospatial features, or property-level detail.
+- The historical time span is still relatively short for a full long-horizon forecasting study.
+
+## Next Steps
+
+1. Add external features such as interest rates, distance to CBD, or demographic indicators.
+2. Introduce walk-forward validation for deeper time-series evaluation.
+3. Package the FastAPI service for cloud deployment on Render, Railway, or Azure.
+4. Add a small frontend dashboard for interactive suburb prediction.
