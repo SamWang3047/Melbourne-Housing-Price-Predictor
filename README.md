@@ -11,6 +11,7 @@ Forecasting quarterly median house prices across Melbourne localities using the 
 - Latest benchmark: `MAE = 93,477.93`, `RMSE = 155,557.10`, `R2 = 0.9236`
 - Deployment: `FastAPI + Uvicorn`
 
+![alt text](image.png)
 ## Why This Project
 
 The goal of this project is to turn irregular government-style housing spreadsheets into a reproducible machine learning workflow that is easy to explain, easy to extend, and practical to deploy.
