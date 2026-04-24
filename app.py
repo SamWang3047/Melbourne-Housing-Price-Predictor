@@ -31,6 +31,7 @@ app = FastAPI(
 
 
 class PredictRequest(BaseModel):
+    # Optional lag inputs let callers override the default history-based features.
     locality: str = Field(..., description="Locality name such as ABBOTSFORD")
     year: int = Field(..., ge=2000, le=2100)
     quarter: Literal[1, 2, 3, 4]
@@ -48,6 +49,7 @@ class PredictResponse(BaseModel):
 
 
 class ForecastResponse(BaseModel):
+    # The frontend uses this payload to fill summary cards and load the chart image.
     locality: str
     prediction_year: int
     prediction_quarter: int
@@ -189,6 +191,7 @@ def localities(query: str = "") -> dict[str, list[str]]:
 
 @app.get("/forecast", response_model=ForecastResponse)
 def forecast(locality: str) -> ForecastResponse:
+    # Return summary data for the next-quarter forecast.
     return build_forecast(locality)
 
 
@@ -202,6 +205,7 @@ def forecast_chart(locality: str) -> StreamingResponse:
     history_values = locality_history["median_price"].tolist()
     forecast_label = f"{forecast_result.prediction_year} Q{forecast_result.prediction_quarter}"
 
+    # Plot the historical series and then extend it with a visually distinct forecast segment.
     fig, ax = plt.subplots(figsize=(15, 8))
     ax.plot(history_labels, history_values, marker="o", linewidth=2.5, color="#1f77b4", label="Historical price")
     ax.plot(
@@ -253,6 +257,7 @@ def forecast_chart(locality: str) -> StreamingResponse:
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest) -> PredictResponse:
+    # Use explicit lag values when provided; otherwise fall back to the latest exported history.
     model = load_model()
     history = load_history()
 
@@ -283,6 +288,7 @@ def predict(request: PredictRequest) -> PredictResponse:
         ]
     )
 
+    # The saved model expects one row with the engineered features used during training.
     predicted_price = float(model.predict(features)[0])
     return PredictResponse(
         locality=request.locality.upper(),

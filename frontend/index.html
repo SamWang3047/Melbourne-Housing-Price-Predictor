@@ -254,6 +254,7 @@
   </div>
 
   <script>
+    // Cache the main UI nodes once so the handlers can reuse them cheaply.
     const input = document.getElementById("locality-input");
     const button = document.getElementById("search-button");
     const suggestionsBox = document.getElementById("suggestions");
@@ -271,6 +272,7 @@
     let currentSuggestions = [];
 
     function formatCurrency(value) {
+      // Keep currency formatting consistent across the summary cards.
       return new Intl.NumberFormat("en-AU", {
         style: "currency",
         currency: "AUD",
@@ -291,6 +293,7 @@
       }
 
       items.forEach((item) => {
+        // Clicking a suggestion fills the input and immediately runs the forecast.
         const div = document.createElement("div");
         div.className = "suggestion";
         div.textContent = item;
@@ -306,6 +309,7 @@
     }
 
     async function fetchSuggestions() {
+      // Query the backend as the user types to populate autocomplete options.
       const value = input.value.trim();
       if (!value) {
         renderSuggestions([]);
@@ -318,6 +322,7 @@
     }
 
     async function fetchForecast() {
+      // Load both the summary payload and the chart image for the selected locality.
       const locality = input.value.trim();
       if (!locality) {
         setStatus("Please enter a locality first.");
@@ -340,6 +345,7 @@
         fields.latest.textContent = formatCurrency(data.latest_actual_price);
         fields.predicted.textContent = formatCurrency(data.predicted_median_price);
 
+        // Add a timestamp so the browser always requests the newest chart image.
         chart.src = `${data.chart_url}&ts=${Date.now()}`;
         chart.style.display = "block";
         placeholder.style.display = "none";
@@ -356,6 +362,7 @@
     });
 
     input.addEventListener("keydown", (event) => {
+      // Pressing Enter submits the currently typed locality.
       if (event.key === "Enter") {
         event.preventDefault();
         fetchForecast();
@@ -365,6 +372,7 @@
     button.addEventListener("click", fetchForecast);
 
     document.addEventListener("click", (event) => {
+      // Close the suggestion panel when the click happens outside the search box.
       if (!suggestionsBox.contains(event.target) && event.target !== input) {
         suggestionsBox.style.display = "none";
       }
